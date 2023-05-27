@@ -47,9 +47,9 @@ class Player {
 
     update() {
         this.frames++
-            if (this.frames > 28)
+        if (this.frames > 28) this.frames = 0
 
-                this.draw()
+        this.drwaw
         this.position.x += this.velocity.x
         this.position.y += this.velocity.y
         if (this.position.y + this.height + this.velocity.y <= canvas.height)
