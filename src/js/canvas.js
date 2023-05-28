@@ -7,12 +7,19 @@ import spriteRunLeft from '../img/spriteRunLeft.png'
 import spriteRunRight from '../img/spriteRunRight.png'
 import spriteStandLeft from '../img/spriteStandLeft.png'
 import spriteStandRight from '../img/spriteStandRight.png'
+import spriteMunchLeft from '../img/spriteMunchLeft.png'
+import spriteMunchRight from '../img/spriteMunchRight.png'
+import orange from '../img/orange.png'
+
 
 const canvas = document.querySelector('canvas')
 const c = canvas.getContext('2d')
 
 canvas.width = 1024
 canvas.height = 576
+
+var counter = 0; // declare a global counter variable
+var speed = 10; // declare a global speed variable that controls how often the animation updates
 
 const gravity = 0.5
 class Player {
@@ -26,30 +33,48 @@ class Player {
             x: 0,
             y: 0
         }
-        this.width = 66
-        this.height = 150
+        this.width = 128
+        this.height = 128
 
         this.image = createImage(spriteStandRight)
         this.frames = 0
+        this.sprites = {
+            stand : {
+                right: createImage(spriteStandRight),
+                left: createImage(spriteStandLeft)
+            },
+            run: {
+                right: createImage(spriteRunRight),
+                left: createImage(spriteRunLeft)
+            },
+            munch: {
+                right: createImage(spriteMunchRight),
+                left: createImage(spriteMunchLeft)
+            }
+        }
+
+        this.currentSprite = this.sprites.stand.right
     }
     draw() {
         c.drawImage(
-            this.image,
-            0,
-            0,
-            101 * this.frames,
-            87,
-            this.position.x,
-            this.position.y,
-            this.width,
-            this.height)
+           this.currentSprite,
+           64 * this.frames,
+           0,
+           64,
+           54,
+           this.position.x,
+           this.position.y,
+           this.width,
+           this.height)
     }
 
     update() {
-        this.frames++
-        if (this.frames > 28) this.frames = 0
-
-        this.drwaw
+        counter++; // increment the counter every frame
+        if (counter % speed == 0) { // check if the counter is divisible by the speed
+            this.frames++; // update the animation only when the condition is true
+            if (this.frames > 7) this.frames = 0;
+          }
+        this.draw()
         this.position.x += this.velocity.x
         this.position.y += this.velocity.y
         if (this.position.y + this.height + this.velocity.y <= canvas.height)
@@ -140,7 +165,7 @@ function init() {
         }),
         new Platform({ x: platformImage.width * 4 + 300 + platformImage.width - platformSmallTallImage.width, y: 260, image: createImage(platformSmallTall) }),
         new Platform({ x: platformImage.width - 3, y: 470, image: platformImage }),
-        new Platform({ x: platformImage.width * 2 + 100, y: 470, image: platformImage }),
+        new Platform({ x: platformImage.width * 2 -3, y: 470, image: platformImage }),
         new Platform({ x: platformImage.width * 3 + 300, y: 470, image: platformImage }),
         new Platform({ x: platformImage.width * 4 + 300, y: 470, image: platformImage }),
         new Platform({ x: platformImage.width * 5 + 950, y: 470, image: platformImage }),
@@ -163,6 +188,7 @@ function init() {
         new Platform({ x: platformImage.width * 22 + 6800, y: 470, image: platformImage }),
         new Platform({ x: platformImage.width * 23 + 7100, y: 470, image: platformImage }),
         new Platform({ x: platformImage.width * 24 + 7500, y: 350, image: platformImage }),
+        new Platform({ x: platformImage.width * 24 + 7580, y: -100, image: createImage(orange)})
     ]
 
     genericObjects = [
@@ -182,6 +208,8 @@ function init() {
     scrollOffset = 0
 
 }
+
+
 
 function animate() {
     requestAnimationFrame(animate)
@@ -230,13 +258,27 @@ function animate() {
             }
         })
         // win condition
-    if (scrollOffset > 2000) {
+    if (scrollOffset > 23280) {
         console.log('you win!!')
+        // display text on canvas
+        c.font = "48px serif"; // set font size and style
+        c.fillStyle = "black"; // set text color
+        c.textAlign = "center"; // set text alignment
+        c.fillText("You won, have an orange!", canvas.width/2, canvas.height/2); // draw text at the center of the canvas
+
     }
 
     // lose condition
     if (player.position.y > canvas.height) {
-        init()
+        // display text on canvas
+        c.font = "48px serif"; // set font size and style
+        c.fillStyle = "black"; // set text color
+        c.textAlign = "center"; // set text alignment
+        c.fillText("Died", canvas.width/2, canvas.height/2); // draw text at the center of the canvas
+        setTimeout(function() {
+            // call init() after 2 seconds
+            init();
+          }, 1000);
     }
 }
 
@@ -250,13 +292,16 @@ window.addEventListener('keydown', ({ keyCode }) => {
         case 65:
             console.log('left')
             keys.left.pressed = true
+            player.currentSprite = player.sprites.run.left
             break
         case 83:
             console.log('down')
+            player.currentSprite = player.sprites.munch.right
             break
         case 68:
             console.log('right')
             keys.right.pressed = true
+            player.currentSprite = player.sprites.run.right
             break
         case 87:
             console.log('up')
@@ -274,13 +319,16 @@ window.addEventListener('keyup', ({ keyCode }) => {
         case 65:
             console.log('left')
             keys.left.pressed = false
+            player.currentSprite = player.sprites.stand.left
             break
         case 83:
             console.log('down')
+            player.currentSprite = player.sprites.stand.right
             break
         case 68:
             console.log('right')
             keys.right.pressed = false
+            player.currentSprite = player.sprites.stand.right
             break
         case 87:
             console.log('up')
