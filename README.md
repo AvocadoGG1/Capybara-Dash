@@ -1,9 +1,12 @@
-How to play game. 
+## Getting Started
 
 1.  Clone the repo:
 
         git clone https://github.com/AvocadoGG1/Capybara-Dash.git
-
+2. Navigate to the project directory:
+```
+        cd Capybara-Dash
+```
 2.  Install dependencies:
 
         npm install
